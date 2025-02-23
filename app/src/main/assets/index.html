@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Offline Budget Planning App</title>
+  <!-- Link to external CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Offline Budget Planning App</h1>
+  </header>
+  
+  <main>
+    <!-- Budget Summary -->
+    <section class="summary">
+      <div class="summary-box">
+        <h3>Total Income</h3>
+        <p id="total-income">$0.00</p>
+      </div>
+      <div class="summary-box">
+        <h3>Total Expenses</h3>
+        <p id="total-expense">$0.00</p>
+      </div>
+      <div class="summary-box">
+        <h3>Net Balance</h3>
+        <p id="net-balance">$0.00</p>
+      </div>
+    </section>
+    
+    <!-- Transaction Form -->
+    <section class="transaction-form">
+      <form id="transaction-form">
+        <label for="description">Description</label>
+        <input 
+          type="text" 
+          id="description" 
+          required 
+          placeholder="e.g., Salary, Groceries"
+        />
+        
+        <label for="amount">Amount</label>
+        <input 
+          type="number" 
+          id="amount" 
+          required 
+          placeholder="Enter amount" 
+          step="0.01"
+        />
+        
+        <label for="type">Type</label>
+        <select id="type">
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+        
+        <button type="submit">Add Transaction</button>
+      </form>
+    </section>
+    
+    <!-- Transaction List -->
+    <section class="transactions">
+      <h2>Transactions</h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="transaction-list">
+            <!-- Transactions will be dynamically added here -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Link to external JS -->
+  <script src="script.js"></script>
+</body>
+</html>
