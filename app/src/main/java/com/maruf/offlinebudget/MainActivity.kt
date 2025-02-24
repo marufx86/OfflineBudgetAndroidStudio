@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             OfflineBudgetTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    // Replace the Greeting composable with our WebViewScreen
+                    // Load the WebViewScreen with DOM storage enabled.
                     WebViewScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
@@ -36,11 +36,13 @@ fun WebViewScreen(modifier: Modifier = Modifier) {
         modifier = modifier,
         factory = { context ->
             WebView(context).apply {
-                // Enable JavaScript if your HTML requires it
+                // Enable JavaScript if your HTML requires it.
                 settings.javaScriptEnabled = true
-                // Ensure links load within the WebView instead of the default browser
+                // Enable DOM storage to allow localStorage to work.
+                settings.domStorageEnabled = true
+                // Ensure links load within the WebView instead of the default browser.
                 webViewClient = WebViewClient()
-                // Load the HTML file from the assets folder
+                // Load the HTML file from the assets folder.
                 loadUrl("file:///android_asset/index.html")
             }
         }

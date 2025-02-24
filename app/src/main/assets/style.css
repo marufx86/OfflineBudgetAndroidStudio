@@ -37,11 +37,11 @@ main {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
-  flex-wrap: wrap; /* Allows items to wrap on small screens */
+  flex-wrap: wrap;
 }
 .summary-box {
   flex: 1 1 30%;
-  min-width: 180px; /* Ensures boxes don't get too narrow on phones */
+  min-width: 180px;
   text-align: center;
   margin: 10px 5px;
   background-color: #fafafa;
@@ -98,17 +98,16 @@ main {
   margin-bottom: 10px;
   font-weight: 600;
 }
-/* Wrapping table in a container to allow horizontal scroll on small screens */
 .table-container {
   width: 100%;
-  overflow-x: auto; 
+  overflow-x: auto;
   margin-bottom: 20px;
   border: 1px solid #ddd;
   border-radius: 3px;
 }
 table {
   width: 100%;
-  min-width: 500px; /* Enough so columns don't get too squished on phones */
+  min-width: 500px;
   border-collapse: collapse;
 }
 thead {
