@@ -1,0 +1,195 @@
+html
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konumlu Hızlı Sipariş - WhatsApp</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        h1 { color: #333; text-align: center; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input[type="text"], input[type="number"], textarea, select {
+            width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+        }
+        .category-select { margin-bottom: 20px; }
+        
+        /* Konum Butonu Stili */
+        #locationButton {
+            background-color: #FF5722; /* Turuncu renk */
+            color: white; padding: 12px; margin-top: 10px; border: none; border-radius: 4px; 
+            cursor: pointer; width: 100%; font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        #locationButton:hover { background-color: #E64A19; }
+
+        /* Ana Gönder Butonu Stili */
+        #sendButton {
+            background-color: #25D366; /* WhatsApp yeşili */
+            color: white; padding: 15px 20px; margin-top: 25px; border: none; border-radius: 50px; 
+            cursor: pointer; width: 100%; font-size: 18px; font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        #sendButton:hover { background-color: #128C7E; }
+        #location-status { margin-top: 10px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Konum Destekli Hızlı Sipariş</h1>
+
+    <form id="orderForm">
+        
+        <label for="address">Teslimat Adresi (Konum veya Metin):</label>
+        <textarea id="address" rows="3" placeholder="Apartman adı, kat veya daire no gibi ek detayları yazınız."></textarea>
+        
+        <button type="button" id="locationButton">📍 Mevcut Konumumu Otomatik Bul</button>
+        <p id="location-status">Durum: Konum bekleniyor veya manuel adres giriniz.</p>
+        <input type="hidden" id="latitude">
+        <input type="hidden" id="longitude">
+        <label for="foodProduct">Yemek Seçimi:</label>
+        <select id="foodProduct">
+            <option value="">-- Yemek Seçiniz (Opsiyonel) --</option>
+            <option value="Izgara Tavuk Menu (95 TL)">Izgara Tavuk Menü (95 TL)</option>
+            <option value="Et Doner Porsiyon (130 TL)">Et Döner Porsiyon (130 TL)</option>
+        </select>
+        
+        <label for="dessertProduct">Tatlı Seçimi:</label>
+        <select id="dessertProduct">
+            <option value="">-- Tatlı Seçiniz (Opsiyonel) --</option>
+            <option value="Sutlac (50 TL)">Sütlaç (50 TL)</option>
+            <option value="Kunefe (75 TL)">Künefe (75 TL)</option>
+        </select>
+
+        <label for="quantity">Adet (Tüm sipariş için geçerli):</label>
+        <input type="number" id="quantity" value="1" min="1" required>
+
+        <label for="name">Adınız Soyadınız:</label>
+        <input type="text" id="name" required placeholder="Adınız">
+        
+        <label for="payment">Ödeme Yöntemi:</label>
+        <select id="payment" required>
+            <option value="Kapıda Nakit Odeme">Kapıda Nakit Ödeme</option>
+            <option value="Kapıda Kredi Karti">Kapıda Kredi Kartı</option>
+        </select>
+
+        <button type="submit" id="sendButton">WhatsApp İle Siparişi Gönder</button>
+        <p id="error-message" style="color: red; text-align: center; margin-top: 15px; display: none;">Lütfen en az bir ürün seçimi yapınız!</p>
+
+    </form>
+</div>
+
+<script>
+    // **********************************************
+    // KONUM BULUCU (GEOLOCATION API) İŞLEVİ
+    // **********************************************
+    
+    let latInput = document.getElementById('latitude');
+    let lonInput = document.getElementById('longitude');
+    let locationStatus = document.getElementById('location-status');
+    let locationButton = document.getElementById('locationButton');
+
+    locationButton.addEventListener('click', function() {
+        locationStatus.innerText = 'Durum: Konum alınıyor...';
+        locationButton.disabled = true;
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                // Başarılı olursa
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    
+                    latInput.value = lat;
+                    lonInput.value = lon;
+                    locationStatus.innerText = 'Durum: ✅ Konumunuz başarıyla alındı!';
+                    locationButton.innerText = '📍 Konum Güncellendi';
+                },
+                // Hata olursa
+                (error) => {
+                    locationStatus.innerText = 'Durum: ❌ Konum alınamadı. (Lütfen tarayıcınızdan izin verin)';
+                    locationButton.disabled = false;
+                }
+            );
+        } else {
+            locationStatus.innerText = 'Durum: Tarayıcınız GPS konumunu desteklemiyor.';
+            locationButton.disabled = false;
+        }
+    });
+
+    // **********************************************
+    // WHATSAPP GÖNDERME İŞLEVİ
+    // **********************************************
+
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Verileri al
+        const food = document.getElementById('foodProduct').value;
+        const dessert = document.getElementById('dessertProduct').value;
+        const quantity = document.getElementById('quantity').value;
+        const name = document.getElementById('name').value;
+        const address = document.getElementById('address').value;
+        const payment = document.getElementById('payment').value;
+        const latitude = document.getElementById('latitude').value;
+        const longitude = document.getElementById('longitude').value;
+        
+        // SEÇİM KONTROLÜ
+        if (!food && !dessert) { // Sadece yemek ve tatlı kontrol ediliyor
+            document.getElementById('error-message').style.display = 'block';
+            return;
+        } else {
+             document.getElementById('error-message').style.display = 'none';
+        }
+        
+        // Sipariş edilen ürünleri topla
+        let orderedItems = '';
+        if (food) orderedItems += `Yemek: ${food}%0A`;
+        if (dessert) orderedItems += `Tatlı: ${dessert}%0A`;
+        
+        // KONUM LİNKİNİ OLUŞTUR (Google Maps linki)
+        let locationLink = '';
+        let locationText = '';
+        
+        if (latitude && longitude) {
+            locationLink = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+            locationText = `*Konum:* ✅ Gelen GPS Koordinatları%0A*Harita Linki:* ${locationLink}%0A`;
+        } else if (address) {
+            locationText = `*Konum:* 📝 Manuel Adres%0A*Detay:* ${address}%0A`;
+        } else {
+             locationText = `*Konum:* ❌ Adres Veya GPS GÖNDERİLMEDİ!%0A`;
+        }
+
+
+        // WhatsApp mesaj metnini oluştur
+        const message = 
+            `*YENİ SİPARİŞ ALINDI (Web Sitesi)*%0A` + 
+            `-----------------------------------------%0A` +
+            `*MÜŞTERİ BİLGİLERİ*%0A` +
+            `Ad Soyad: ${name}%0A` +
+            `Ödeme: ${payment}%0A` +
+            locationText +
+            `-----------------------------------------%0A` +
+            `*SİPARİŞ DETAYI (Adet: ${quantity})*%0A` +
+            orderedItems +
+            `Lütfen Hazırlayınız!`;
+
+        // 3. WhatsApp linkini oluştur
+        // ! BURAYI KENDİ NUMARANIZLA DEĞİŞTİRİN !
+        const phoneNumber = '905448520415'; // <-- KENDİ NUMARANIZI YAZIN
+        
+        const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        
+        // 4. Kullanıcıyı WhatsApp'a yönlendir
+        window.open(whatsappURL, '_blank');
+        
+        // Butonu devre dışı bırakıp teşekkür mesajı göster
+        document.getElementById('sendButton').innerText = "Siparişiniz WhatsApp'a İletildi. Onay bekleniyor.";
+        document.getElementById('sendButton').disabled = true;
+    });
+</script>
+
+</body>
+</html>
